@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="64dp"
+    android:layout_height="64dp"
+    android:layout_marginHorizontal="4dp">
+
+    <com.google.android.material.checkbox.MaterialCheckBox
+        android:id="@+id/cbxWaveform"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/drawable_checkbox_selector"
+        android:button="@null" />
+
+    <ImageView
+        android:id="@+id/ivWaveform"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="10dp"
+        android:padding="4dp"
+        android:scaleType="centerInside"
+        app:srcCompat="@drawable/ic_waveform_triangle"
+        app:tint="@color/waveformButtonColor" />
+
+    <TextView
+        android:id="@+id/tvWaveform"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_marginBottom="2dp"
+        android:gravity="center"
+        android:text="@string/waveform_triangle"
+        android:textColor="@color/waveformButtonColor"
+        android:textSize="10sp" />
+
+    <FrameLayout
+        android:id="@+id/flWaveform"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="true"
+        android:focusable="true"
+        android:layout_marginHorizontal="4dp"/>
+</FrameLayout>

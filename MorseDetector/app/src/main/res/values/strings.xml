@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">MorseDetector</string>
+
+    <string name="waveform_sine">Sine</string>
+    <string name="waveform_triangle">Triangle</string>
+    <string name="waveform_saw_tooth">Saw Tooth</string>
+    <string name="waveform_square">Square</string>
+
+    <string name="frequency">%s Hz</string>
+    <string name="volume">%s Db</string>
+    <string name="groupsPerMinute">%s Groups Per Minute</string>
+</resources>
