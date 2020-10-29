@@ -1,6 +1,7 @@
 package com.example.morsedetector.util
 
 import com.example.morsedetector.model.AudioParams
+import com.example.morsedetector.util.math.ComplexNumber
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
@@ -76,6 +77,31 @@ class AudioDataTransformer {
             }
         }
     }
+
+    fun floatArrayToComplexArray(srcArray: FloatArray): Array<ComplexNumber> {
+        return Array(srcArray.size) { ComplexNumber(srcArray[it], 0f) }
+    }
+
+    fun floatArrayToComplexArray(srcArray: FloatArray, resultArray: Array<ComplexNumber>) {
+        var idx = 0
+        while(idx < srcArray.size && idx < resultArray.size) {
+            resultArray[idx].r = srcArray[idx]
+            idx++
+        }
+    }
+
+    fun complexArrayToFloatArray(srcArray: Array<ComplexNumber>): FloatArray {
+        return FloatArray(srcArray.size) { srcArray[it].r }
+    }
+
+    fun complexArrayToFloatArray(srcArray: Array<ComplexNumber>, resultArray: FloatArray) {
+        var idx = 0
+        while (idx < srcArray.size && idx < resultArray.size) {
+            resultArray[idx] = srcArray[idx].r
+            idx++
+        }
+    }
+
 
     private fun toByteArray(value: Float, byteRate: Int): ByteArray {
         return when (byteRate) {
