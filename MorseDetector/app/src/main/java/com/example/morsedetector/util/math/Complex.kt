@@ -56,7 +56,7 @@ class ComplexNumber() {
 
     //    @Throws(IllegalArgumentException::class)
     operator fun div(divider: ComplexNumber): ComplexNumber {
-        return if (!isZero(divider.r) && !isZero(divider.i)) {
+        return if (!isZero(divider.r) || !isZero(divider.i)) {
             ComplexNumber(
                 (this.r * divider.r + this.i * divider.i) / (divider.r * divider.r + divider.i * divider.i),
                 (this.i * divider.r - this.r * divider.i) / (divider.r * divider.r + divider.i * divider.i)
@@ -124,17 +124,26 @@ class ComplexNumber() {
     }
 
 
-    fun add(number: ComplexNumber): ComplexNumber {
-        return this + number
-    }
-
-    fun sub(number: ComplexNumber): ComplexNumber {
-        return this - number
-    }
-
-    fun mul(number: ComplexNumber): ComplexNumber {
-        return this * number
-    }
+//    fun add(addition: ComplexNumber) {
+//        val newR = this.r + addition.r
+//        val newI = this.i + addition.i
+//        this.r = newR
+//        this.i = newI
+//    }
+//
+//    fun sub(subtrahend: ComplexNumber) {
+//        val newR = this.r - subtrahend.r
+//        val newI = this.i - subtrahend.i
+//        this.r = newR
+//        this.i = newI
+//    }
+//
+//    fun mul(multiplier: ComplexNumber) {
+//        val newReal = this.r * multiplier.r - this.i * multiplier.i
+//        val newImage = this.r * multiplier.i + this.i * multiplier.r
+//        this.r = newReal
+//        this.i = newImage
+//    }
 
     fun pow(number: ComplexNumber): ComplexNumber {
         val n = 0

@@ -2,8 +2,10 @@ package com.example.morsedetector.util
 
 import com.example.morsedetector.model.AudioParams
 import com.example.morsedetector.util.math.ComplexNumber
+import com.example.morsedetector.util.math.MathUtil
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
+import kotlin.math.log
 
 class AudioDataTransformer {
     var audioParams: AudioParams = AudioParams.createDefault()
@@ -78,11 +80,14 @@ class AudioDataTransformer {
         }
     }
 
-    fun floatArrayToComplexArray(srcArray: FloatArray): Array<ComplexNumber> {
-        return Array(srcArray.size) { ComplexNumber(srcArray[it], 0f) }
+
+
+    fun floatArrayToComplexArray(srcArray: FloatArray, sizeToPowerOfTwo: Boolean = false): Array<ComplexNumber> {
+        val resultArraySize = MathUtil.getNearestPowerOfTwo(srcArray.size)
+        return Array(resultArraySize) { ComplexNumber(srcArray.getOrNull(it) ?: 0f, 0f) }
     }
 
-    fun floatArrayToComplexArray(srcArray: FloatArray, resultArray: Array<ComplexNumber>) {
+    fun floatArrayToComplexArray(srcArray: FloatArray, resultArray: Array<ComplexNumber>, sizeToPowerOfTwo: Boolean = false) {
         var idx = 0
         while(idx < srcArray.size && idx < resultArray.size) {
             resultArray[idx].r = srcArray[idx]
@@ -102,6 +107,13 @@ class AudioDataTransformer {
         }
     }
 
+    fun copyFloatArray(srcArray: FloatArray): FloatArray {
+        return  FloatArray(srcArray.size) { srcArray[it] }
+    }
+
+    fun copyComplexArray(srcArray: Array<ComplexNumber>): Array<ComplexNumber> {
+        return Array<ComplexNumber>(srcArray.size) { srcArray[it].copy() }
+    }
 
     private fun toByteArray(value: Float, byteRate: Int): ByteArray {
         return when (byteRate) {
