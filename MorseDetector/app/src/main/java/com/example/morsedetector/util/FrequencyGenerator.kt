@@ -11,10 +11,7 @@ import java.lang.Math.sin
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.time.Duration
-import kotlin.math.PI
-import kotlin.math.pow
-import kotlin.math.roundToInt
-import kotlin.math.roundToLong
+import kotlin.math.*
 import kotlin.random.Random
 
 class FrequencyGenerator() {
@@ -163,15 +160,27 @@ class SawToothWaveGenerator(audioParams: AudioParams) : WaveGenerator(audioParam
         volume: Float
     ): Float {
         var result = 0f
-        val argument = 2f * PI * frequency * currentTimeMs / 1000f
-        for (k in K) {
-            result += sin(k * argument).toFloat() / k
-        }
-        result *= audioParams.samplesAmplitude
-        result /= PI.toFloat()
-        result = audioParams.samplesAmplitude / 2f - result
+        val time = currentTimeMs / 1000f
+        val argument = 2f * frequency * time * floor(0.5f + frequency * time)
+        result = audioParams.samplesAmplitude * argument
         return applyVolume(result, volume)
     }
+
+//    override fun getValue(
+//        currentTimeMs: Float,
+//        frequency: Float,
+//        volume: Float
+//    ): Float {
+//        var result = 0f
+//        val argument = 2f * PI * frequency * currentTimeMs / 1000f
+//        for (k in K) {
+//            result += sin(k * argument).toFloat() / k
+//        }
+//        result *= audioParams.samplesAmplitude
+//        result /= PI.toFloat()
+//        result = audioParams.samplesAmplitude / 2f - result
+//        return applyVolume(result, volume)
+//    }
 }
 
 class TriangleWaveGenerator(audioParams: AudioParams) : WaveGenerator(audioParams) {
@@ -186,13 +195,26 @@ class TriangleWaveGenerator(audioParams: AudioParams) : WaveGenerator(audioParam
     ): Float {
         var result = 0f
         val argument = 2f * PI * frequency * currentTimeMs / 1000f
-        for (k in K) {
-            result += pow(-1.0, (k - 1.0) / 2.0).toFloat() * sin(k * argument).toFloat() / (k * k)
-        }
-        result *= 8f * audioParams.samplesAmplitude
-        result /= SQUARE_PI.toFloat()
+        result = sin(argument).toFloat()
+        result = asin(result) * 2f / PI.toFloat()
+        result = result * audioParams.samplesAmplitude
         return applyVolume(result, volume)
     }
+
+//    override fun getValue(
+//        currentTimeMs: Float,
+//        frequency: Float,
+//        volume: Float
+//    ): Float {
+//        var result = 0f
+//        val argument = 2f * PI * frequency * currentTimeMs / 1000f
+//        for (k in K) {
+//            result += pow(-1.0, (k - 1.0) / 2.0).toFloat() * sin(k * argument).toFloat() / (k * k)
+//        }
+//        result *= 8f * audioParams.samplesAmplitude
+//        result /= SQUARE_PI.toFloat()
+//        return applyVolume(result, volume)
+//    }
 }
 
 class SquareWaveGenerator(audioParams: AudioParams) : WaveGenerator(audioParams) {
@@ -207,11 +229,8 @@ class SquareWaveGenerator(audioParams: AudioParams) : WaveGenerator(audioParams)
     ): Float {
         var result = 0f
         val argument = 2f * PI * frequency * currentTimeMs / 1000f
-        for (k in K) {
-            result += sin(k * argument).toFloat() / k
-        }
-        result *= 4f * audioParams.samplesAmplitude
-        result /= PI.toFloat()
+        result = sign(sin(argument)).toFloat()
+        result = result * audioParams.samplesAmplitude
         return applyVolume(result, volume)
     }
 }
@@ -274,8 +293,8 @@ fun main() {
         val noiseFloatArray = dataTransformer.generateFloatArray(duration)
         val noiseFloatArray2 = dataTransformer.generateFloatArray(duration)
 
-        noiseGenerator.generateNoise(noiseFloatArray, NoiseType.RED, 0.5f)
-        noiseGenerator.generateNoise(noiseFloatArray2, NoiseType.WHITE, 0.2f)
+        noiseGenerator.generateNoise(noiseFloatArray, NoiseType.RED, 1f)
+//        noiseGenerator.generateNoise(noiseFloatArray2, NoiseType.WHITE, 0.2f)
         if (!it.silence) {
             frequencyGenerator.generate(dataFloatArray, waveformType, frequency, volume)
         } else {

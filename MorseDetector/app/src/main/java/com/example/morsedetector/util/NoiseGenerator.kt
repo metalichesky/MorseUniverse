@@ -1,6 +1,9 @@
 package com.example.morsedetector.util
 
 import com.example.morsedetector.model.AudioParams
+import com.example.morsedetector.util.math.ComplexNumber
+import com.example.morsedetector.util.math.FourierTransformer
+import com.example.morsedetector.util.math.MathUtil
 import java.io.File
 import java.lang.Math.pow
 import kotlin.math.*
@@ -9,6 +12,7 @@ import kotlin.random.Random
 class NoiseGenerator {
     var audioParams: AudioParams = AudioParams.createDefault()
 //    private var rand = Random(System.currentTimeMillis())
+    val fourierTransformer = FourierTransformer()
 
     private var timeOffset: Float = 0f
 
@@ -36,7 +40,26 @@ class NoiseGenerator {
     val rand = Random(System.currentTimeMillis())
 
     fun generateRedNoise(dataArray: FloatArray, volume: Float) {
-        generateNoise(dataArray, volume,  300f)
+        generateWhiteNoise(dataArray, volume)
+
+        val audioDataTransformer = AudioDataTransformer()
+        //filter noise
+        val complexDataSize = MathUtil.getNearestPowerOfTwo(dataArray.size)
+        val complexData = Array<ComplexNumber>(complexDataSize) { ComplexNumber() }
+        audioDataTransformer.floatArrayToComplexArray(dataArray, complexData)
+        fourierTransformer.completeIPFFT(complexData, true)
+        for (i in 0 until complexDataSize) {
+            val maxFrequency = complexDataSize / 8
+
+            val coefficient = ((maxFrequency - i.toFloat()) / maxFrequency).clamp(0f, 1f)
+            complexData[i].r = complexData[i].r * coefficient
+            complexData[i].i = complexData[i].i * coefficient
+        }
+        fourierTransformer.completeIPFFT(complexData, false)
+        for (i in dataArray.indices){
+            dataArray[i] = complexData[i].r
+        }
+//        generateNoise(dataArray, volume,  300f)
     }
 
     fun generateNoise(dataArray: FloatArray, volume: Float, frequency: Float) {
@@ -94,7 +117,9 @@ enum class NoiseType() {
 fun main() {
     val audioParams = AudioParams.createDefault()
     val dataTransformer = AudioDataTransformer()
+    val fourierTransformer = FourierTransformer()
     val fileWriter = AudioFileWriter()
+
 
     val noiseGenerator = NoiseGenerator()
     var bigger = 0
@@ -115,11 +140,13 @@ fun main() {
         Pair(NoiseType.RED, "C:\\Users\\Dmitriy\\Desktop\\red_noise.wav")
     )
 
-    val dataFloatArray = dataTransformer.generateFloatArray(5000f)
+    val dataFloatArray = dataTransformer.generateFloatArray(100f)
     noises.forEach {
         val resultFile = File(it.second)
-        noiseGenerator.generateNoise(dataFloatArray, it.first, 1f)
-        fileWriter.write(dataTransformer.floatArrayToByteArray(dataFloatArray))
+        for (i in 0 until 100) {
+            noiseGenerator.generateNoise(dataFloatArray, it.first, 1f)
+            fileWriter.write(dataTransformer.floatArrayToByteArray(dataFloatArray))
+        }
         fileWriter.complete(resultFile, audioParams)
         fileWriter.release()
     }
