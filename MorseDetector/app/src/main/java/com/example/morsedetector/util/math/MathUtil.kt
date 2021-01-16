@@ -54,5 +54,8 @@ object MathUtil {
         maxBit = maxBit shl 1
         return maxBit
     }
+}
 
+fun Float.clamp(from: Float, to: Float): Float {
+    return Math.min(Math.max(this, from), to)
 }

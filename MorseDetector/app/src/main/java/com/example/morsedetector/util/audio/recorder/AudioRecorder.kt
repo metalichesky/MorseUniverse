@@ -1,7 +1,8 @@
-package com.example.morsedetector.util
+package com.example.morsedetector.util.audio.recorder
 
 import android.media.*
 import android.util.Log
+import com.example.morsedetector.util.audio.transformer.SimpleResampler
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -72,7 +73,8 @@ class AudioRecorder{
             }
         }
         channelsCount =  if (enabledChannels == AudioFormat.CHANNEL_IN_MONO) 1 else 2
-        Log.d(LOG_TAG,"Best settings: " +
+        Log.d(
+            LOG_TAG,"Best settings: " +
                 "sample rate = ${enabledSampleRate}, " +
                 "encoding = ${if (enabledEncoding == AudioFormat.ENCODING_PCM_8BIT) "8bit" else "16bit"}, " +
                 "channels = ${if (enabledChannels == AudioFormat.CHANNEL_IN_MONO) "mono" else "stereo"}, " +
@@ -100,7 +102,8 @@ class AudioRecorder{
             enabledEncoding,
             minBufferSize*10
         )
-        resampler = SimpleResampler()
+        resampler =
+            SimpleResampler()
         resampler.let {
             it!!.bitrate = if (enabledEncoding == AudioFormat.ENCODING_PCM_8BIT) 8 else 16
             it.channelsCount = channelsCount
@@ -486,7 +489,8 @@ class AudioRecorder{
                         audioTrackIdx = muxer!!.addTrack(format)
                         muxer!!.start()
                     } else if (outputBufIndex != MediaCodec.INFO_TRY_AGAIN_LATER) {
-                        Log.e(LOG_TAG,
+                        Log.e(
+                            LOG_TAG,
                             "Unknown return code from dequeueOutputBuffer - $outputBufIndex")
                     }
                     outputBufIndex = encoder!!.dequeueOutputBuffer(outBuffInfo, 0)

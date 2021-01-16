@@ -1,4 +1,4 @@
-package com.example.morsedetector.util
+package com.example.morsedetector.util.audio.file
 
 import android.media.MediaCodec
 import android.media.MediaFormat
@@ -124,7 +124,13 @@ class MuxRender(
                 .order(ByteOrder.nativeOrder())
         }
         byteBuffer!!.put(byteBuf)
-        sampleInfoList!!.add(SampleInfo(sampleType, bufferInfo.size, bufferInfo))
+        sampleInfoList!!.add(
+            SampleInfo(
+                sampleType,
+                bufferInfo.size,
+                bufferInfo
+            )
+        )
     }
 
     private fun getTrackIndexForSampleType(sampleType: SampleType): Int {

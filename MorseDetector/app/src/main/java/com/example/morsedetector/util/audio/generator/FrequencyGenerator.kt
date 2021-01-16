@@ -1,6 +1,10 @@
-package com.example.morsedetector.util
+package com.example.morsedetector.util.audio.generator
 
 import com.example.morsedetector.model.*
+import com.example.morsedetector.util.*
+import com.example.morsedetector.util.audio.file.WavFileWriter
+import com.example.morsedetector.util.audio.transformer.AudioDataTransformer
+import com.example.morsedetector.util.audio.transformer.AudioMixer
 import java.io.File
 import java.lang.Math.sin
 import kotlin.math.*
@@ -22,10 +26,18 @@ class FrequencyGenerator() {
     private fun getNextValues(dataArray: FloatArray, waveType: WaveformType, frequency: Float, volume: Float) {
         var valueIdx = 0
         val waveGenerator = when (waveType) {
-            WaveformType.SQUARE -> SquareWaveGenerator(params)
-            WaveformType.TRIANGLE -> TriangleWaveGenerator(params)
-            WaveformType.SAW_TOOTH -> SawToothWaveGenerator(params)
-            else -> SineWaveGenerator(params)
+            WaveformType.SQUARE -> SquareWaveGenerator(
+                params
+            )
+            WaveformType.TRIANGLE -> TriangleWaveGenerator(
+                params
+            )
+            WaveformType.SAW_TOOTH -> SawToothWaveGenerator(
+                params
+            )
+            else -> SineWaveGenerator(
+                params
+            )
         }
         val bytesCount = dataArray.size * params.encoding.byteRate
         val durationMs = bytesCount / params.bytesPerMs
@@ -229,13 +241,17 @@ class SquareWaveGenerator(audioParams: AudioParams) : WaveGenerator(audioParams)
 
 fun main() {
     val audioParams = AudioParams.createDefault()
-    val dataTransformer = AudioDataTransformer()
+    val dataTransformer =
+        AudioDataTransformer()
     val fileWriter = WavFileWriter()
     val resultFile = File("C:\\Users\\Dmitriy\\Desktop\\morse.wav")
     resultFile.createNewFile()
-    val frequencyGenerator = FrequencyGenerator()
-    val silenceGenerator = SilenceGenerator()
-    val noiseGenerator = NoiseGenerator()
+    val frequencyGenerator =
+        FrequencyGenerator()
+    val silenceGenerator =
+        SilenceGenerator()
+    val noiseGenerator =
+        NoiseGenerator()
 
     val rand = Random(System.currentTimeMillis())
     val textSize = 60 * 5
@@ -285,7 +301,8 @@ fun main() {
         val noiseFloatArray = dataTransformer.generateFloatArray(duration)
         val noiseFloatArray2 = dataTransformer.generateFloatArray(duration)
 
-        noiseGenerator.generateNoise(noiseFloatArray, NoiseType.RED, 1f)
+        noiseGenerator.generateNoise(noiseFloatArray,
+            NoiseType.BROWN, 1f)
 //        noiseGenerator.generateNoise(noiseFloatArray2, NoiseType.WHITE, 0.2f)
         if (!it.silence) {
             frequencyGenerator.generate(dataFloatArray, waveformType, frequency, volume)
@@ -293,8 +310,16 @@ fun main() {
             silenceGenerator.generate(dataFloatArray)
         }
 
-        AudioMixer.mix(dataFloatArray, noiseFloatArray, dataFloatArray)
-        AudioMixer.mix(dataFloatArray, noiseFloatArray2, dataFloatArray)
+        AudioMixer.mix(
+            dataFloatArray,
+            noiseFloatArray,
+            dataFloatArray
+        )
+        AudioMixer.mix(
+            dataFloatArray,
+            noiseFloatArray2,
+            dataFloatArray
+        )
 
         fileWriter.write(dataTransformer.floatArrayToByteArray(dataFloatArray))
     }

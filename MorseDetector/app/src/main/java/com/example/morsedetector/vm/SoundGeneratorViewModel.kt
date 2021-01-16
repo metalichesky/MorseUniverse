@@ -1,17 +1,14 @@
 package com.example.morsedetector.vm
 
-import android.os.Environment
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.morsedetector.App
 import com.example.morsedetector.model.*
-import com.example.morsedetector.util.WavFileWriter
+import com.example.morsedetector.util.audio.file.WavFileWriter
 import com.example.morsedetector.util.Constants
-import com.example.morsedetector.util.SamplesPlayer
+import com.example.morsedetector.util.audio.player.SamplesPlayer
 import kotlinx.coroutines.*
-import java.io.File
 
 class SoundGeneratorViewModel : ViewModel() {
     companion object {
@@ -19,8 +16,10 @@ class SoundGeneratorViewModel : ViewModel() {
     }
 
     val generator = MorseCodeSignalGenerator()
-    val samplesPlayer = SamplesPlayer()
-    val audioFileWriter = WavFileWriter()
+    val samplesPlayer =
+        SamplesPlayer()
+    val audioFileWriter =
+        WavFileWriter()
 
     val playing = MutableLiveData<Boolean>()
 

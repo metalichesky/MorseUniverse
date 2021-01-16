@@ -1,4 +1,4 @@
-package com.example.morsedetector.util
+package com.example.morsedetector.util.audio.file
 
 import android.media.MediaCodec
 import android.media.MediaCodecInfo
@@ -16,7 +16,8 @@ class AudioEncoder {
         private const val DRAIN_STATE_CONSUMED = 2
         private const val AUDIO_FORMAT_PREFIX = "audio/"
         private const val ENCODER_TIMEOUT = 5L
-        private val SAMPLE_TYPE: MuxRender.SampleType = MuxRender.SampleType.AUDIO
+        private val SAMPLE_TYPE: MuxRender.SampleType =
+            MuxRender.SampleType.AUDIO
 
         fun createOutputFormatAAC(inputFormat: MediaFormat): MediaFormat {
             return if (MediaFormat.MIMETYPE_AUDIO_AAC == inputFormat.getString(MediaFormat.KEY_MIME)) {

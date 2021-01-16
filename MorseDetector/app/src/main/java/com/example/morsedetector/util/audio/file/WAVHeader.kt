@@ -1,4 +1,4 @@
-package com.example.morsedetector.util
+package com.example.morsedetector.util.audio.file
 
 import com.example.morsedetector.model.AudioParams
 
@@ -11,11 +11,17 @@ class WAVHeader(
 
         fun getHeaderForSamples(audioParams: AudioParams, numSamples: Int): ByteArray? {
             val bytesCount = audioParams.bytesPerSample * numSamples
-            return WAVHeader(audioParams, bytesCount).header
+            return WAVHeader(
+                audioParams,
+                bytesCount
+            ).header
         }
 
         fun getHeaderForBytes(audioParams: AudioParams, bytesCount: Int): ByteArray? {
-            return WAVHeader(audioParams, bytesCount).header
+            return WAVHeader(
+                audioParams,
+                bytesCount
+            ).header
         }
     }
     var header: ByteArray? = null // the complete header

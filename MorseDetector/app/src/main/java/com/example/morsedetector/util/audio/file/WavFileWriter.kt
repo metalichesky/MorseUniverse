@@ -1,6 +1,5 @@
-package com.example.morsedetector.util
+package com.example.morsedetector.util.audio.file
 
-import android.os.Environment
 import com.example.morsedetector.App
 import com.example.morsedetector.model.AudioParams
 import java.io.*
@@ -18,8 +17,12 @@ class WavFileWriter {
     }
 
     private fun getCacheDir(): File {
-//        return File("C:\\Users\\Dmitriy\\Desktop\\cache")
-        return App.instance.externalCacheDir!!
+        return File("C:\\Users\\Dmitriy\\Desktop\\cache").apply {
+            if (!exists()) {
+                mkdirs()
+            }
+        }
+//        return App.instance.externalCacheDir!!
     }
 
     private fun createTempFile(): File {
@@ -44,7 +47,11 @@ class WavFileWriter {
         val fileSize = tempFile.length().toInt()
         println("complete() writed size ${tempFileSize} file size ${fileSize}")
         if (readed > 0) {
-            destinationFileStream.write(WAVHeader(audioParams, fileSize).header)
+            destinationFileStream.write(
+                WAVHeader(
+                    audioParams,
+                    fileSize
+                ).header)
         }
         while(readed > 0) {
             destinationFileStream.write(byteArray, 0, readed)

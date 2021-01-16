@@ -1,11 +1,10 @@
-package com.example.morsedetector.util
+package com.example.morsedetector.util.audio.transformer
 
 import com.example.morsedetector.model.AudioParams
 import com.example.morsedetector.util.math.ComplexNumber
 import com.example.morsedetector.util.math.MathUtil
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
-import kotlin.math.log
 
 class AudioDataTransformer {
     var audioParams: AudioParams = AudioParams.createDefault()
@@ -245,7 +244,8 @@ fun main() {
 
 
 
-    val dataTransformer = AudioDataTransformer()
+    val dataTransformer =
+        AudioDataTransformer()
 
     val floatArray = FloatArray(10) {
         it.toFloat()

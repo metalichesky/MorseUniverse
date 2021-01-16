@@ -1,7 +1,6 @@
-package com.example.morsedetector.util
+package com.example.morsedetector.util.audio.transformer
 
 import com.example.morsedetector.model.AudioParams
-import java.lang.Integer.min
 
 data class ChannelParams (
     val audioParams: AudioParams,
@@ -12,7 +11,11 @@ object AudioMixer {
     fun mix(channel1: FloatArray, channel2: FloatArray): FloatArray {
         val resultArraySize = Math.min(channel1.size, channel2.size)
         val resultArray = FloatArray(resultArraySize)
-        mix(channel1, channel2, resultArray)
+        mix(
+            channel1,
+            channel2,
+            resultArray
+        )
         return resultArray
     }
 
@@ -30,7 +33,11 @@ object AudioMixer {
     fun mix(channel1: ShortArray, channel2: ShortArray): ShortArray {
         val resultArraySize = Math.min(channel1.size, channel2.size)
         val resultArray = ShortArray(resultArraySize)
-        mix(channel1, channel2, resultArray)
+        mix(
+            channel1,
+            channel2,
+            resultArray
+        )
         return resultArray
     }
 

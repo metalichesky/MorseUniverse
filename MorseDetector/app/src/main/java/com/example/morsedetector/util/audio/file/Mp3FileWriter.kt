@@ -1,4 +1,4 @@
-package com.example.morsedetector.util
+package com.example.morsedetector.util.audio.file
 
 import java.io.ByteArrayOutputStream
 

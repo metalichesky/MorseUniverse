@@ -1,10 +1,12 @@
 package com.example.morsedetector.util.math
 
 import com.example.morsedetector.model.WaveformType
-import com.example.morsedetector.util.*
+import com.example.morsedetector.util.audio.generator.FrequencyGenerator
+import com.example.morsedetector.util.audio.generator.NoiseGenerator
+import com.example.morsedetector.util.audio.transformer.AudioDataTransformer
+import com.example.morsedetector.util.audio.transformer.WindowFunctions
 import kotlin.math.*
 import kotlin.system.measureNanoTime
-import kotlin.system.measureTimeMillis
 
 class FourierTransformer {
     companion object {
@@ -262,17 +264,20 @@ class FourierTransformer {
                 dataArray[i] = dataArray[i] * coefficient
             }
         }
-
     }
 }
 
 
 fun main() {
     var fourierTransformer = FourierTransformer()
-    val frequencyGenerator: FrequencyGenerator = FrequencyGenerator()
-    val noiseGenerator = NoiseGenerator()
-    val dataTransformer: AudioDataTransformer = AudioDataTransformer()
-    val windowFunctions = WindowFunctions()
+    val frequencyGenerator: FrequencyGenerator =
+        FrequencyGenerator()
+    val noiseGenerator =
+        NoiseGenerator()
+    val dataTransformer: AudioDataTransformer =
+        AudioDataTransformer()
+    val windowFunctions =
+        WindowFunctions()
 
     val durationMs = 10f
     val data = dataTransformer.generateFloatArray(durationMs)

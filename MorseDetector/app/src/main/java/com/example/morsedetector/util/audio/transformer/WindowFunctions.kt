@@ -1,4 +1,4 @@
-package com.example.morsedetector.util
+package com.example.morsedetector.util.audio.transformer
 
 import com.example.morsedetector.model.AudioParams
 import java.lang.Math.cos
@@ -8,7 +8,8 @@ import kotlin.math.PI
 class WindowFunctions {
     var audioParams: AudioParams = AudioParams.createDefault()
 
-    var windowFunction: WindowFunction = GausseWindowFunction()
+    var windowFunction: WindowFunction =
+        GausseWindowFunction()
 
     fun applyWindow(dataArray: FloatArray) {
         val samplesCount = dataArray.size / audioParams.channelsCount
@@ -85,8 +86,10 @@ class CaiserWindowFunction() : WindowFunction() {
 
 fun main() {
     val srcArray = FloatArray(10) { 100f }
-    val window = WindowFunctions()
-    window.windowFunction = HammingWindowFunction()
+    val window =
+        WindowFunctions()
+    window.windowFunction =
+        HammingWindowFunction()
     window.applyWindow(srcArray)
     println(srcArray.joinToString())
 }

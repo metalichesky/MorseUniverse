@@ -1,4 +1,4 @@
-package com.example.morsedetector.util
+package com.example.morsedetector.util.audio.file
 
 import android.media.AudioFormat
 import android.media.MediaFormat

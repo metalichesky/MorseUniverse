@@ -1,8 +1,6 @@
 package com.example.morsedetector.ui
 
-import android.media.AudioFormat
 import android.media.MediaFormat
-import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.util.Log
@@ -12,14 +10,16 @@ import android.view.ViewGroup
 import androidx.lifecycle.lifecycleScope
 import com.example.morsedetector.R
 import com.example.morsedetector.model.AudioParams
-import com.example.morsedetector.model.Encoding
-import com.example.morsedetector.util.*
+import com.example.morsedetector.util.audio.file.AudioDecoder
+import com.example.morsedetector.util.audio.file.AudioEncoder
+import com.example.morsedetector.util.audio.file.getAudioParams
+import com.example.morsedetector.util.audio.player.SamplesPlayer
+import com.example.morsedetector.util.audio.transformer.AudioDataTransformer
+import com.example.morsedetector.util.audio.transformer.AudioMixer
 import kotlinx.android.synthetic.main.fragment_decoder.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
-import java.lang.Exception
-import java.util.*
 import kotlin.system.measureTimeMillis
 
 class DecoderFragment() : BaseFragment() {
@@ -27,10 +27,14 @@ class DecoderFragment() : BaseFragment() {
         const val LOG_TAG = "DecoderFragment"
     }
 
-    private var samplesPlayer: SamplesPlayer = SamplesPlayer()
-    private var audioDecoder: AudioDecoder = AudioDecoder()
-    private var audioDecoder2: AudioDecoder = AudioDecoder()
-    private var audioEncoder: AudioEncoder = AudioEncoder()
+    private var samplesPlayer: SamplesPlayer =
+        SamplesPlayer()
+    private var audioDecoder: AudioDecoder =
+        AudioDecoder()
+    private var audioDecoder2: AudioDecoder =
+        AudioDecoder()
+    private var audioEncoder: AudioEncoder =
+        AudioEncoder()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -108,7 +112,8 @@ class DecoderFragment() : BaseFragment() {
                     audioEncoder.setOutputFilePath(resultFile.absolutePath)
                     audioEncoder.setup()
 
-                    audioDataTransformer = AudioDataTransformer().apply {
+                    audioDataTransformer = AudioDataTransformer()
+                        .apply {
                         this.audioParams = audioParams!!
                     }
                     shortBuffer = audioDataTransformer!!.byteArrayToShortArray(buffer)

@@ -1,17 +1,15 @@
 package com.example.morsedetector.model
 
 import android.util.Log
-import androidx.core.math.MathUtils.clamp
-import com.example.morsedetector.util.*
+import com.example.morsedetector.util.audio.generator.FrequencyGenerator
+import com.example.morsedetector.util.audio.generator.NoiseGenerator
+import com.example.morsedetector.util.audio.generator.NoiseType
+import com.example.morsedetector.util.audio.generator.SilenceGenerator
+import com.example.morsedetector.util.audio.transformer.AudioDataTransformer
+import com.example.morsedetector.util.audio.transformer.AudioMixer
 import kotlinx.coroutines.*
-import java.io.OutputStream
-import java.io.OutputStreamWriter
-import java.io.PipedInputStream
-import java.io.PipedOutputStream
 import java.util.*
 import java.util.concurrent.ConcurrentLinkedQueue
-import kotlin.math.max
-import kotlin.math.roundToInt
 import kotlin.math.roundToLong
 import kotlin.system.measureTimeMillis
 
@@ -20,9 +18,12 @@ class MorseCodeSignalGenerator {
         const val LOG_TAG = "MorseCodeGenerator"
     }
 
-    private val frequencyGenerator = FrequencyGenerator()
-    private val silenceGenerator = SilenceGenerator()
-    private val noiseGenerator = NoiseGenerator()
+    private val frequencyGenerator =
+        FrequencyGenerator()
+    private val silenceGenerator =
+        SilenceGenerator()
+    private val noiseGenerator =
+        NoiseGenerator()
     private val channels: MutableList<Channel> = mutableListOf()
 
     var currentVolume: Volume = Volume.fromRatio(1f)
@@ -68,7 +69,8 @@ class MorseCodeSignalGenerator {
                 val symbol = symbolsStack.poll() ?: continue
                 val unit = symbol.alphabet.getUnitMs(currentGroupPerMinute)
                 val soundSequence = symbol.morseCode.getSoundSequence()
-                val dataTransformer = AudioDataTransformer()
+                val dataTransformer =
+                    AudioDataTransformer()
 
                 soundSequence.add(MorsePause.BETWEEN_SYMBOLS)
 
@@ -95,7 +97,7 @@ class MorseCodeSignalGenerator {
                         } else {
                             silenceGenerator.generate(audioBuffer)
                         }
-                        noiseGenerator.generateNoise(noiseBuffer, currentVolume.getRatio() / 2f, currentFrequency)
+                        noiseGenerator.generateNoise(noiseBuffer, NoiseType.BROWN, currentVolume.getRatio() / 2f)
                         AudioMixer.mix(audioBuffer, noiseBuffer, audioBuffer)
                         sendDataToAllChannels(dataTransformer.floatArrayToByteArray(audioBuffer))
                     }

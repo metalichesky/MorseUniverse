@@ -1,19 +1,22 @@
 package com.example.morsedetector.util.math
 
 import com.example.morsedetector.model.AudioParams
+import com.example.morsedetector.util.audio.transformer.FrequencyAudioFilter
+import com.example.morsedetector.util.audio.transformer.FrequencyFilter
 
 class FrequencyDetector {
+    companion object {
+
+    }
 
     val audioParams = AudioParams.createDefault()
 
-    fun getFrequencyResolution(samplesCount: Int): Float {
-        val sampleRate = audioParams.sampleRate
-        return sampleRate.toFloat() / samplesCount
-    }
+
+
 
     fun getFrequenciesFromSpectrum(data: Array<ComplexNumber>) {
         val samplesCount = data.size
-        val frequencyResolution = getFrequencyResolution(samplesCount)
+        val frequencyResolution = FrequencyAudioFilter.getFrequencyResolution(samplesCount, audioParams.sampleRate)
         println("getFrequenciesFromSpectrum() frequency resolution = ${frequencyResolution} samplesCount = ${samplesCount}")
 
         var maxModule = 0f

@@ -1,4 +1,4 @@
-package com.example.morsedetector.util
+package com.example.morsedetector.util.audio.transformer
 
 import java.nio.ByteBuffer
 import java.nio.ByteOrder

@@ -1,11 +1,8 @@
-package com.example.morsedetector.util
+package com.example.morsedetector.util.audio.player
 
 import android.media.*
-import android.os.Build
-import android.os.Handler
 import android.util.Log
 import com.example.morsedetector.model.AudioParams
-import com.example.morsedetector.model.Encoding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.isActive
@@ -13,7 +10,6 @@ import kotlinx.coroutines.launch
 import java.io.IOException
 import java.lang.Exception
 import java.nio.ByteBuffer
-import kotlin.math.roundToInt
 import kotlin.system.measureTimeMillis
 
 

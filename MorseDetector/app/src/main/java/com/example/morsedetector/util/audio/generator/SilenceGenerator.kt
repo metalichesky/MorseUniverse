@@ -1,6 +1,4 @@
-package com.example.morsedetector.util
-
-import com.example.morsedetector.model.AudioParams
+package com.example.morsedetector.util.audio.generator
 
 class SilenceGenerator {
 
