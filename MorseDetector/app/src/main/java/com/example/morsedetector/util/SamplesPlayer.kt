@@ -141,14 +141,31 @@ class SamplesPlayer {
     }
 
 
+//    fun play(byteArray: ByteArray) {
+//        try {
+//            val dataTime = byteArray.size / audioParams.bytesPerMs
+//            val time = measureTimeMillis {
+//                audioPlayer?.write(byteArray, 0, byteArray.size)
+//            }
+//            val sleep = dataTime - time
+//            if (sleep > 0) Thread.sleep(sleep)
+//            Log.d(LOG_TAG, "write time ${time} data time ${dataTime}")
+//        } catch (ex: Exception) {
+//            ex.printStackTrace()
+//        }
+//    }
+
     fun play(byteArray: ByteArray) {
         try {
             val dataTime = byteArray.size / audioParams.bytesPerMs
             val time = measureTimeMillis {
                 audioPlayer?.write(byteArray, 0, byteArray.size)
             }
-            Thread.sleep(dataTime - time)
             Log.d(LOG_TAG, "write time ${time} data time ${dataTime}")
+//            val sleepTime = dataTime - time
+//            if (sleepTime > 0) {
+//                Thread.sleep(sleepTime)
+//            }
         } catch (ex: Exception) {
             ex.printStackTrace()
         }

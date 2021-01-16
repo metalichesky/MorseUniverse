@@ -55,6 +55,33 @@ class AudioDataTransformer {
         }
     }
 
+    fun shortArrayToByteArray(srcArray: ShortArray): ByteArray {
+        val resultArraySize = srcArray.size * audioParams.encoding.byteRate
+        val resultArray = ByteArray(resultArraySize)
+        shortArrayToByteArray(srcArray, resultArray)
+        return resultArray
+    }
+
+    fun shortArrayToByteArray(srcArray: ShortArray, resultArray: ByteArray) {
+        val channelsCount = audioParams.channelsCount
+        val byteRate = audioParams.encoding.byteRate
+
+        var resultIdx = 0
+        var srcIdx = 0
+        while(srcIdx < srcArray.size) {
+            for (channel in 0 until channelsCount) {
+                val value = srcArray[srcIdx]
+                val resultValues = toByteArray(value, byteRate)
+                for (resultValue in resultValues) {
+                    if (resultIdx >= resultArray.size) return
+                    resultArray[resultIdx] = resultValue
+                    resultIdx++
+                }
+                srcIdx++
+            }
+        }
+    }
+
     fun byteArrayToFloatArray(srcArray: ByteArray): FloatArray {
         val resultArraySize = srcArray.size / audioParams.encoding.byteRate
         val resultArray = FloatArray(resultArraySize)
@@ -80,7 +107,30 @@ class AudioDataTransformer {
         }
     }
 
+    fun byteArrayToShortArray(srcArray: ByteArray): ShortArray {
+        val resultArraySize = srcArray.size / audioParams.encoding.byteRate
+        val resultArray = ShortArray(resultArraySize)
+        byteArrayToShortArray(srcArray, resultArray)
+        return resultArray
+    }
 
+    fun byteArrayToShortArray(srcArray: ByteArray, resultArray: ShortArray) {
+        val channelsCount = audioParams.channelsCount
+        val byteRate = audioParams.encoding.byteRate
+        var resultIdx = 0
+        var srcIdx = 0
+        val buffer = ByteArray(byteRate)
+
+        while(srcIdx < srcArray.size) {
+            for (channel in 0 until channelsCount) {
+                if (resultIdx >= resultArray.size) return
+                System.arraycopy(srcArray, srcIdx, buffer, 0, byteRate)
+                srcIdx += byteRate
+                resultArray[resultIdx] = toShort(buffer, byteRate)
+                resultIdx++
+            }
+        }
+    }
 
     fun floatArrayToComplexArray(srcArray: FloatArray, sizeToPowerOfTwo: Boolean = false): Array<ComplexNumber> {
         val resultArraySize = MathUtil.getNearestPowerOfTwo(srcArray.size)
@@ -120,8 +170,29 @@ class AudioDataTransformer {
             4 -> {
                 value.toByteArray()
             }
+            3 -> {
+                value.toInt().toByteArray(3)
+            }
             2 -> {
                 value.toShort().toByteArray()
+            }
+            else -> {
+                //make value unsigned here
+                (value + audioParams.samplesAmplitude).toByte().toByteArray()
+            }
+        }
+    }
+
+    private fun toByteArray(value: Short, byteRate: Int): ByteArray {
+        return when (byteRate) {
+            4 -> {
+                value.toFloat().toByteArray()
+            }
+            3 -> {
+                value.toInt().toByteArray(3)
+            }
+            2 -> {
+                value.toByteArray()
             }
             else -> {
                 //make value unsigned here
@@ -135,12 +206,33 @@ class AudioDataTransformer {
             4 -> {
                 value.toFloat()
             }
+            3 -> {
+                value.toInt().toFloat()
+            }
             2 -> {
                 value.toShort().toFloat()
             }
             else -> {
                 //make value unsigned here
                 value.toByte().toUByte().toFloat() - audioParams.samplesAmplitude
+            }
+        }
+    }
+
+    private fun toShort(value: ByteArray, byteRate: Int): Short {
+        return when (byteRate) {
+            4 -> {
+                value.toShort()
+            }
+            3 -> {
+                value.toInt().toShort()
+            }
+            2 -> {
+                value.toShort()
+            }
+            else -> {
+                //make value unsigned here
+                (value.toByte().toUByte().toShort() - audioParams.samplesAmplitude.toShort()).toShort()
             }
         }
     }
@@ -180,8 +272,13 @@ fun ByteArray.toByte(): Byte {
 fun ByteArray.toShort(): Short {
     return ByteBuffer.wrap(this)
         .order(ByteOrder.LITTLE_ENDIAN)
-        .put(this)
         .getShort()
+}
+
+fun ByteArray.toInt(): Int {
+    return ByteBuffer.wrap(this)
+        .order(ByteOrder.LITTLE_ENDIAN)
+        .getInt()
 }
 
 fun Float.toByteArray(bytesCount: Int = 4): ByteArray {
@@ -191,8 +288,8 @@ fun Float.toByteArray(bytesCount: Int = 4): ByteArray {
         .array()
 }
 
-fun Int.toByteArray(): ByteArray {
-    return ByteBuffer.allocate(4)
+fun Int.toByteArray(size: Int = 4): ByteArray {
+    return ByteBuffer.allocate(size)
         .order(ByteOrder.LITTLE_ENDIAN)
         .putInt(this)
         .array()

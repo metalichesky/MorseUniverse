@@ -2,10 +2,12 @@ package com.example.morsedetector.model
 
 import com.example.morsedetector.repo.AlphabetRepo
 import java.util.*
+import kotlin.math.absoluteValue
 
 class SymbolsText {
     companion object {
         val SLPIT_REGEX = Regex("")
+        private val random = Random(System.currentTimeMillis())
     }
 
     val symbols: MutableList<Symbol> = mutableListOf()
@@ -13,6 +15,19 @@ class SymbolsText {
 
     fun addAlphabet(alphabet: Alphabet) {
         textAlphabets.add(alphabet)
+    }
+
+    fun generateRandom(symbolsCount: Int) {
+        symbols.clear()
+        if (textAlphabets.isEmpty()) return
+        while(symbols.size < symbolsCount) {
+            val alphabetIdx = random.nextInt().absoluteValue.rem(textAlphabets.size)
+            textAlphabets.getOrNull(alphabetIdx)?.let{ alphabet ->
+                if (symbols.size < symbolsCount) {
+                    symbols.add(alphabet.getRandSymbol())
+                }
+            }
+        }
     }
 
     fun addFromString(string: String) {

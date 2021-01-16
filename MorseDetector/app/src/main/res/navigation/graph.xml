@@ -9,4 +9,5 @@
         android:name="com.example.morsedetector.ui.SoundGeneratorFragment"
         android:label="FragmentSoundGenerator" />
 
+
 </navigation>

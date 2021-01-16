@@ -1,16 +1,8 @@
 package com.example.morsedetector.util
 
-import android.media.AudioFormat
-import android.util.Log
 import com.example.morsedetector.model.*
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import java.io.File
-import java.lang.Math.pow
 import java.lang.Math.sin
-import java.nio.ByteBuffer
-import java.nio.ByteOrder
-import java.time.Duration
 import kotlin.math.*
 import kotlin.random.Random
 
@@ -154,33 +146,33 @@ class SawToothWaveGenerator(audioParams: AudioParams) : WaveGenerator(audioParam
         private val K = listOf(1, 2, 3, 4)
     }
 
-    override fun getValue(
-        currentTimeMs: Float,
-        frequency: Float,
-        volume: Float
-    ): Float {
-        var result = 0f
-        val time = currentTimeMs / 1000f
-        val argument = 2f * frequency * time * floor(0.5f + frequency * time)
-        result = audioParams.samplesAmplitude * argument
-        return applyVolume(result, volume)
-    }
-
 //    override fun getValue(
 //        currentTimeMs: Float,
 //        frequency: Float,
 //        volume: Float
 //    ): Float {
 //        var result = 0f
-//        val argument = 2f * PI * frequency * currentTimeMs / 1000f
-//        for (k in K) {
-//            result += sin(k * argument).toFloat() / k
-//        }
-//        result *= audioParams.samplesAmplitude
-//        result /= PI.toFloat()
-//        result = audioParams.samplesAmplitude / 2f - result
+//        val time = currentTimeMs / 1000f
+//        val argument = 2f * frequency * time * floor(0.5f + frequency * time)
+//        result = audioParams.samplesAmplitude * argument
 //        return applyVolume(result, volume)
 //    }
+
+    override fun getValue(
+        currentTimeMs: Float,
+        frequency: Float,
+        volume: Float
+    ): Float {
+        var result = 0f
+        val argument = 2f * PI * frequency * currentTimeMs / 1000f
+        for (k in K) {
+            result += sin(k * argument).toFloat() / k
+        }
+        result *= audioParams.samplesAmplitude
+        result /= PI.toFloat()
+        result = audioParams.samplesAmplitude / 2f - result
+        return applyVolume(result, volume)
+    }
 }
 
 class TriangleWaveGenerator(audioParams: AudioParams) : WaveGenerator(audioParams) {
@@ -238,7 +230,7 @@ class SquareWaveGenerator(audioParams: AudioParams) : WaveGenerator(audioParams)
 fun main() {
     val audioParams = AudioParams.createDefault()
     val dataTransformer = AudioDataTransformer()
-    val fileWriter = AudioFileWriter()
+    val fileWriter = WavFileWriter()
     val resultFile = File("C:\\Users\\Dmitriy\\Desktop\\morse.wav")
     resultFile.createNewFile()
     val frequencyGenerator = FrequencyGenerator()

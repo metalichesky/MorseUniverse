@@ -1,6 +1,5 @@
 package com.example.morsedetector.vm
 
-import android.content.Context
 import android.os.Environment
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
@@ -8,7 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.morsedetector.App
 import com.example.morsedetector.model.*
-import com.example.morsedetector.util.AudioFileWriter
+import com.example.morsedetector.util.WavFileWriter
 import com.example.morsedetector.util.Constants
 import com.example.morsedetector.util.SamplesPlayer
 import kotlinx.coroutines.*
@@ -21,7 +20,7 @@ class SoundGeneratorViewModel : ViewModel() {
 
     val generator = MorseCodeSignalGenerator()
     val samplesPlayer = SamplesPlayer()
-    val audioFileWriter = AudioFileWriter()
+    val audioFileWriter = WavFileWriter()
 
     val playing = MutableLiveData<Boolean>()
 
@@ -36,6 +35,7 @@ class SoundGeneratorViewModel : ViewModel() {
     val waveformType = MutableLiveData<WaveformType>(currentWaveformType)
     val waveformTypes = MutableLiveData<List<WaveformType>>(currentWaveformTypes)
     val groupsPerMinute = MutableLiveData<Float>(currentGroupsPerMinute)
+    var currentText = MutableLiveData<SymbolsText>(SymbolsText())
 
     init {
         setWaveformType(WaveformType.SINE)
@@ -51,11 +51,12 @@ class SoundGeneratorViewModel : ViewModel() {
     var channel: Channel? = null
 
     fun play() {
-        val textString = "ЗЬЫВФ  ЛГОЖЙ  ЦШДЙП  ЦДТМЦ  ЫЩЧЬМ  ЖЫЖВК  ЦЕЛКЦ  ТВЯДЬ  КБЩЦП  ЖРЕЫЖ  ЮКЗОЮ  ФМЩДА  ТСДЕР  ЮЛАЕУ  ЩЫГЖЭ  ЬДЦЕБ  САЭВЫ  ЩЮЧЦХ  ЫТТЛЙ  ВФВКВ  ОЫШВВ  БЧСНЕ  ЭВЗХШ  ЭАЩЖВ  ЬЗДСС  ТЮДБЩ  БЦЙФЛ  ЖИЫКШ  ЛОДРС  ЦЯВБУ  \n"
-        generator.addText(SymbolsText().apply {
-            addAlphabet(Constants.russianAlphabet)
-            addFromString(textString)
-        })
+//        val textString = "ЗЬЫВФ  ЛГОЖЙ  ЦШДЙП  ЦДТМЦ  ЫЩЧЬМ  ЖЫЖВК  ЦЕЛКЦ  ТВЯДЬ  КБЩЦП  ЖРЕЫЖ  ЮКЗОЮ  ФМЩДА  ТСДЕР  ЮЛАЕУ  ЩЫГЖЭ  ЬДЦЕБ  САЭВЫ  ЩЮЧЦХ  ЫТТЛЙ  ВФВКВ  ОЫШВВ  БЧСНЕ  ЭВЗХШ  ЭАЩЖВ  ЬЗДСС  ТЮДБЩ  БЦЙФЛ  ЖИЫКШ  ЛОДРС  ЦЯВБУ  \n"
+        val text = currentText.value ?: return
+        text.addAlphabet(Constants.russianAlphabet)
+        text.generateRandom(60)
+        generator.clear()
+        generator.addText(text)
         channel = generator.addReceiver()
         generator.start(viewModelScope)
 
@@ -67,9 +68,10 @@ class SoundGeneratorViewModel : ViewModel() {
                 if (data != null) {
                     Log.d(LOG_TAG, "received data size ${data.size}")
                     samplesPlayer.play(data)
-                    audioFileWriter.write(data)
+//                    audioFileWriter.write(data)
                 }
             }
+            pause()
             Log.d(LOG_TAG, "end receiving")
         }
         playing.postValue(true)
@@ -81,18 +83,18 @@ class SoundGeneratorViewModel : ViewModel() {
 
         playing.postValue(false)
 
-        val dir = App.instance.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) ?: return
-        val file = File(dir, "record.wav")
-        dir.mkdirs()
-        file.createNewFile()
-        Log.d(LOG_TAG, "saving into file ${file.absolutePath}")
-        audioFileWriter.complete(file, AudioParams.createDefault())
+//        val dir = App.instance.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) ?: return
+//        val file = File(dir, "record.wav")
+//        dir.mkdirs()
+//        file.createNewFile()
+//        Log.d(LOG_TAG, "saving into file ${file.absolutePath}")
+//        audioFileWriter.complete(file, AudioParams.createDefault())
     }
 
     fun stop() {
         pause()
         samplesPlayer.stop()
-        audioFileWriter.release()
+//        audioFileWriter.release()
     }
 
     private fun initWaveformTypes(): List<WaveformType> {

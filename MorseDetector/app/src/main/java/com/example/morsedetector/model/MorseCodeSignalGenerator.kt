@@ -2,9 +2,7 @@ package com.example.morsedetector.model
 
 import android.util.Log
 import androidx.core.math.MathUtils.clamp
-import com.example.morsedetector.util.Constants
-import com.example.morsedetector.util.FrequencyGenerator
-import com.example.morsedetector.util.SilenceGenerator
+import com.example.morsedetector.util.*
 import kotlinx.coroutines.*
 import java.io.OutputStream
 import java.io.OutputStreamWriter
@@ -15,6 +13,7 @@ import java.util.concurrent.ConcurrentLinkedQueue
 import kotlin.math.max
 import kotlin.math.roundToInt
 import kotlin.math.roundToLong
+import kotlin.system.measureTimeMillis
 
 class MorseCodeSignalGenerator {
     companion object {
@@ -23,6 +22,7 @@ class MorseCodeSignalGenerator {
 
     private val frequencyGenerator = FrequencyGenerator()
     private val silenceGenerator = SilenceGenerator()
+    private val noiseGenerator = NoiseGenerator()
     private val channels: MutableList<Channel> = mutableListOf()
 
     var currentVolume: Volume = Volume.fromRatio(1f)
@@ -68,6 +68,7 @@ class MorseCodeSignalGenerator {
                 val symbol = symbolsStack.poll() ?: continue
                 val unit = symbol.alphabet.getUnitMs(currentGroupPerMinute)
                 val soundSequence = symbol.morseCode.getSoundSequence()
+                val dataTransformer = AudioDataTransformer()
 
                 soundSequence.add(MorsePause.BETWEEN_SYMBOLS)
 
@@ -80,33 +81,33 @@ class MorseCodeSignalGenerator {
 
                 soundSequence.forEachIndexed { idx, sound ->
                     val duration = (sound.unitDuration * unit).roundToLong()
-//                    val data = if (!sound.silence) {
-//                        generateSound(duration)
-//                    } else {
-//                        generateSilence(duration)
-//                    }
-//                    sendDataToAllChannels(data)
-//                    val delayDuration = duration - generatorTake - 25
-//                    if (delayDuration > 0) {
-//                        delay(delayDuration)
-//                    }
+
+                    val generatorTake = measureTimeMillis {
+                        val audioBuffer = dataTransformer.generateFloatArray(duration.toFloat())
+                        val noiseBuffer = dataTransformer.generateFloatArray(duration.toFloat())
+                        if (!sound.silence) {
+                            frequencyGenerator.generate(
+                                audioBuffer,
+                                currentWaveformType,
+                                currentFrequency,
+                                currentVolume.getRatio()
+                            )
+                        } else {
+                            silenceGenerator.generate(audioBuffer)
+                        }
+                        noiseGenerator.generateNoise(noiseBuffer, currentVolume.getRatio() / 2f, currentFrequency)
+                        AudioMixer.mix(audioBuffer, noiseBuffer, audioBuffer)
+                        sendDataToAllChannels(dataTransformer.floatArrayToByteArray(audioBuffer))
+                    }
+                    val delayDuration = duration - generatorTake// - generatorTake - 25
+                    if (delayDuration > 0) {
+                        delay(delayDuration)
+                    }
                 }
             }
             Log.d(LOG_TAG, "end generator")
         }
-    }
-
-    private fun generateSound(floatArray: FloatArray) {
-        frequencyGenerator.generate(
-            floatArray,
-            currentWaveformType,
-            currentFrequency,
-            currentVolume.getRatio()
-        )
-    }
-
-    private fun generateSilence(floatArray: FloatArray) {
-        silenceGenerator.generate(floatArray)
+//        generatorJob?.start()
     }
 
     private suspend fun sendDataToAllChannels(byteArray: ByteArray) {

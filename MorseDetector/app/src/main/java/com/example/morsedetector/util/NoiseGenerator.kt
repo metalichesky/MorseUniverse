@@ -118,7 +118,7 @@ fun main() {
     val audioParams = AudioParams.createDefault()
     val dataTransformer = AudioDataTransformer()
     val fourierTransformer = FourierTransformer()
-    val fileWriter = AudioFileWriter()
+    val fileWriter = WavFileWriter()
 
 
     val noiseGenerator = NoiseGenerator()

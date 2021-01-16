@@ -6,7 +6,7 @@ import com.example.morsedetector.model.AudioParams
 import java.io.*
 import java.util.*
 
-class AudioFileWriter {
+class WavFileWriter {
     private var fileStream: BufferedOutputStream? = null
     private var tempFile: File? = null
     private var tempFileSize: Int = 0
@@ -18,8 +18,8 @@ class AudioFileWriter {
     }
 
     private fun getCacheDir(): File {
-        return File("C:\\Users\\Dmitriy\\Desktop\\cache")
-        //return App.instance.externalCacheDir!!
+//        return File("C:\\Users\\Dmitriy\\Desktop\\cache")
+        return App.instance.externalCacheDir!!
     }
 
     private fun createTempFile(): File {
