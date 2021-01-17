@@ -21,15 +21,19 @@ class AudioParams(
 
     val bytesPerMs: Int  //bytes per one millisecond
 
-    val bytesPerSample: Int //bytes per one sample
+    val bytesPerFrame: Int //bytes per one sample
 
     val samplesAmplitude: Float //amplitude value for samples
 
     init {
-        val bytes = (sampleRate.toFloat() * channelsCount * encoding.byteRate) / 1000f
+        val bytes = (sampleRate.toFloat() * channelsCount * encoding.bytesPerSample) / 1000f
         this.bytesPerMs =  floor(bytes).toInt()
-        this.bytesPerSample = channelsCount * encoding.byteRate
-        val maxUnsignedNumber = (2.0.pow(encoding.byteRate.toDouble() * 8.0).toFloat())
+        this.bytesPerFrame = channelsCount * encoding.bytesPerSample
+        val maxUnsignedNumber = (2.0.pow(encoding.bytesPerSample.toDouble() * 8.0).toFloat())
         this.samplesAmplitude = maxUnsignedNumber / 2f - 1f
+    }
+
+    override fun toString(): String {
+        return "sample rate = ${sampleRate}, channels count = ${channelsCount}, encoding ${encoding.name}"
     }
 }

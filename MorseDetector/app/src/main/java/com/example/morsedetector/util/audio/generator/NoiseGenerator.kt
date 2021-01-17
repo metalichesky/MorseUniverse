@@ -6,9 +6,6 @@ import com.example.morsedetector.util.audio.file.WavFileWriter
 import com.example.morsedetector.util.audio.transformer.FrequencyAudioFilter
 import com.example.morsedetector.util.audio.transformer.FrequencyFilter
 import com.example.morsedetector.util.audio.transformer.FrequencyPoint
-import com.example.morsedetector.util.math.ComplexNumber
-import com.example.morsedetector.util.math.FourierTransformer
-import com.example.morsedetector.util.math.MathUtil
 import java.io.File
 import java.lang.Math.pow
 import kotlin.math.*
@@ -66,8 +63,8 @@ class NoiseGenerator {
 
     private fun generateRedNoise(dataArray: FloatArray, volume: Float) {
         val amplitude = audioParams.samplesAmplitude
-        val bytesCount = dataArray.size * audioParams.encoding.byteRate
-        val samplesCount = (bytesCount.toFloat() / audioParams.bytesPerSample).roundToInt()
+        val bytesCount = dataArray.size * audioParams.encoding.bytesPerSample
+        val samplesCount = (bytesCount.toFloat() / audioParams.bytesPerFrame).roundToInt()
         val durationMs = bytesCount.toFloat() / audioParams.bytesPerMs
         val deltaMs = durationMs / samplesCount
         val startTimeMs = timeOffset
@@ -185,7 +182,6 @@ fun main() {
     val fileWriter = WavFileWriter()
 
     val noiseGenerator = NoiseGenerator()
-
 
     val noises = listOf<Pair<NoiseType, String>>(
         Pair(NoiseType.WHITE, "C:\\Users\\Dmitriy\\Desktop\\white_noise.wav"),

@@ -15,7 +15,7 @@ class FrequencyGenerator() {
         const val LOG_TAG = "FrequencyGenerator"
     }
 
-    private var params: AudioParams = AudioParams.createDefault()
+    var params: AudioParams = AudioParams.createDefault()
 
     private var timeOffset: Float = 0f
 
@@ -39,11 +39,11 @@ class FrequencyGenerator() {
                 params
             )
         }
-        val bytesCount = dataArray.size * params.encoding.byteRate
+        val bytesCount = dataArray.size * params.encoding.bytesPerSample
         val durationMs = bytesCount / params.bytesPerMs
         val startTimeMs = timeOffset
         val endTimeMs = timeOffset + durationMs
-        val samplesCount = bytesCount / params.bytesPerSample
+        val samplesCount = bytesCount / params.bytesPerFrame
         val deltaTimeMs = (endTimeMs - startTimeMs) / samplesCount
 
         var currentTimeMs = startTimeMs

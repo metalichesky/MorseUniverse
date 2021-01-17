@@ -30,12 +30,12 @@ class WavFileWriter {
         return File(getCacheDir(), name)
     }
 
-    fun write(byteArray: ByteArray) {
+    fun write(byteArray: ByteArray, size: Int = byteArray.size) {
         if (tempFile == null) {
             prepare()
         }
-        fileStream?.write(byteArray)
-        tempFileSize += byteArray.size
+        fileStream?.write(byteArray, 0, size)
+        tempFileSize += size
     }
 
     fun complete(file: File, audioParams: AudioParams) {
@@ -59,6 +59,7 @@ class WavFileWriter {
         }
         destinationFileStream.flush()
         destinationFileStream.close()
+        sourceFileStream.close()
     }
 
     fun release() {

@@ -1,16 +1,16 @@
 package com.example.morsedetector.util.audio.file
 
 import com.example.morsedetector.model.AudioParams
+import com.example.morsedetector.model.Encoding
+import com.example.morsedetector.util.audio.transformer.toByte
+import kotlin.experimental.and
 
-class WAVHeader(
-    private val audioParams: AudioParams,
-    private val audioDataBytesCount: Int = 0
-) {
+class WAVHeader {
     companion object {
         const val HEADER_SIZE = 46
 
         fun getHeaderForSamples(audioParams: AudioParams, numSamples: Int): ByteArray? {
-            val bytesCount = audioParams.bytesPerSample * numSamples
+            val bytesCount = audioParams.bytesPerFrame * numSamples
             return WAVHeader(
                 audioParams,
                 bytesCount
@@ -23,23 +23,43 @@ class WAVHeader(
                 bytesCount
             ).header
         }
+
+        fun getHeaderFromBytes(bytes: ByteArray): WAVHeader {
+            return WAVHeader(bytes)
+        }
     }
+
     var header: ByteArray? = null // the complete header
         private set
+    var audioParams: AudioParams
+    private set
+    var audioDataBytesCount: Int
+    private set
 
-    private val bytesPerSample: Int = audioParams.bytesPerSample
-    private val bitsPerSample: Int = audioParams.encoding.byteRate * 8
-    private val channelsCount: Int = audioParams.channelsCount
-    private val sampleRate: Int = audioParams.sampleRate
-
-    init {
-        setHeader()
+    constructor(audioParams: AudioParams, audioDataBytesCount: Int = 0) {
+        this.audioParams = audioParams
+        this.audioDataBytesCount = audioDataBytesCount
+        writeHeader()
     }
 
-    private fun setHeader() {
+    constructor(headerRawBytes: ByteArray) {
+        // initial values
+        audioParams = AudioParams.createDefault()
+        audioDataBytesCount = 0
+
+        readHeader(headerRawBytes)
+    }
+
+    private fun writeHeader() {
         val header = ByteArray(HEADER_SIZE)
         var offset = 0
         var size: Int
+
+
+        val bytesPerSample: Int = audioParams.bytesPerFrame
+        val bitsPerSample: Int = audioParams.encoding.bytesPerSample * 8
+        val channelsCount: Int = audioParams.channelsCount
+        val sampleRate: Int = audioParams.sampleRate
 
         // set the RIFF chunk
         System.arraycopy(
@@ -121,6 +141,80 @@ class WAVHeader(
         header[offset++] = (size shr 16 and 0xFF).toByte()
         header[offset++] = (size shr 24 and 0xFF).toByte()
         this.header = header
+    }
+
+    private fun readHeader(header: ByteArray) {
+        var offset = 0
+        offset += 4
+        var size: Int = 0
+        size = size or (header[offset++].toUByte().toInt())
+        size = size or (header[offset++].toUByte().toInt() shl 8)
+        size = size or (header[offset++].toUByte().toInt() shl 16)
+        size = size or (header[offset++].toUByte().toInt() shl 24)
+        audioDataBytesCount = size - 36
+        println("size ${audioDataBytesCount}")
+        offset += 4
+        offset += 4
+        offset += 4
+        offset += 2
+
+        var channelsCount: Int = 0
+        channelsCount = channelsCount or (header[offset++].toUByte().toInt())
+        channelsCount = channelsCount or (header[offset++].toUByte().toInt() shl 8)
+        // audioParams.channelsCount = channelsCount
+
+        var sampleRate: Int = 0
+        sampleRate = sampleRate or (header[offset++].toUByte().toInt())
+        sampleRate = sampleRate or (header[offset++].toUByte().toInt() shl 8)
+        sampleRate = sampleRate or (header[offset++].toUByte().toInt() shl 16)
+        sampleRate = sampleRate or (header[offset++].toUByte().toInt() shl 24)
+        // audioParams.sampleRate = sampleRate
+
+        var byteRate = 0//sampleRate * bytesPerSample (bytes per second)
+        byteRate = byteRate or (header[offset++].toUByte().toInt())
+        byteRate = byteRate or (header[offset++].toUByte().toInt() shl 8)
+        byteRate = byteRate or (header[offset++].toUByte().toInt() shl 16)
+        byteRate = byteRate or (header[offset++].toUByte().toInt() shl 24)
+
+
+        var bytesPerFrame = 0
+        bytesPerFrame = bytesPerFrame or (header[offset++].toUByte().toInt())
+        bytesPerFrame = bytesPerFrame or (header[offset++].toUByte().toInt() shl 8)
+        // audioParams.bytesPerFrame = bytesPerFrame
+
+        var bitsPerSample = 0
+        bitsPerSample = bitsPerSample or (header[offset++].toUByte().toInt())
+        bitsPerSample = bitsPerSample or (header[offset++].toUByte().toInt() shl 8)
+        val bytesPerSample = bitsPerSample / 8
+        // audioParams.encoding.bytesPerSample = bitsPerSample / 8
+
+        // set the beginning of the data chunk
+        offset += 4
+        var audioDataSize = 0
+        audioDataSize = audioDataSize or (header[offset++].toUByte().toInt())
+        audioDataSize = audioDataSize or (header[offset++].toUByte().toInt() shl 8)
+        audioDataSize = audioDataSize or (header[offset++].toUByte().toInt() shl 16)
+        audioDataSize = audioDataSize or (header[offset++].toUByte().toInt() shl 24)
+        audioDataBytesCount = audioDataSize
+        this.header = header
+        audioParams = AudioParams(
+            sampleRate = sampleRate,
+            channelsCount = channelsCount,
+            encoding = when(bytesPerSample) {
+                1 -> {
+                    Encoding.PCM_8BIT
+                }
+                2 -> {
+                    Encoding.PCM_16BIT
+                }
+                3 -> {
+                    Encoding.PCM_24BIT
+                }
+                else -> {
+                    Encoding.PCM_FLOAT
+                }
+            }
+        )
     }
 
     override fun toString(): String {

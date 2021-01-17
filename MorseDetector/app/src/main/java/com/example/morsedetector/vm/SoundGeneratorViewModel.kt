@@ -7,6 +7,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.morsedetector.model.*
 import com.example.morsedetector.util.audio.file.WavFileWriter
 import com.example.morsedetector.util.Constants
+import com.example.morsedetector.util.audio.generator.Channel
+import com.example.morsedetector.util.audio.generator.MorseCodeSignalGenerator
 import com.example.morsedetector.util.audio.player.SamplesPlayer
 import kotlinx.coroutines.*
 
@@ -15,7 +17,8 @@ class SoundGeneratorViewModel : ViewModel() {
         const val LOG_TAG = "SoundGeneratorViewModel"
     }
 
-    val generator = MorseCodeSignalGenerator()
+    val generator =
+        MorseCodeSignalGenerator()
     val samplesPlayer =
         SamplesPlayer()
     val audioFileWriter =
