@@ -1,7 +1,6 @@
 package com.example.morsedetector.util.audio.generator
 
-import android.graphics.Bitmap
-import android.graphics.Color
+import android.graphics.*
 import com.example.morsedetector.model.*
 import com.example.morsedetector.util.Constants
 import com.example.morsedetector.util.audio.file.WavFileReader
@@ -11,12 +10,11 @@ import com.example.morsedetector.util.audio.transformer.AudioMixer
 import com.example.morsedetector.util.math.clamp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
-import java.awt.Graphics2D
 import java.awt.image.BufferedImage
 import java.io.File
+import java.io.FileOutputStream
 import java.util.*
 import java.util.concurrent.ConcurrentLinkedQueue
-import javax.imageio.ImageIO
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 import kotlin.math.roundToLong
@@ -158,10 +156,12 @@ class TrainDataGenerator {
     }
 
 
-    fun generateSymbolSpectrogram(file: File) {
+    fun generateSymbolSpectrogram(file: File, spectrogramSize: Int = 100) {
         val transformer = AudioDataTransformer()
         val spectrogramGenerator = SpectrogramGenerator()
         val durationMs = 3000L
+        val resultFileName = file.name.removeSuffix(file.extension) + ".jpg"
+        val resultFile = File(file.parent, resultFileName)
 
         val audioFileReader = WavFileReader()
         audioFileReader.prepare(file)
@@ -170,7 +170,6 @@ class TrainDataGenerator {
         transformer.audioParams = audioParams
         println("audioParams = ${audioParams}")
 
-        val spectrogramSize = 100
         if (audioFileReader.hasMore()) {
             val rawAudioBuffer = transformer.generateByteArray(durationMs.toFloat())
             val readedSize = audioFileReader.read(rawAudioBuffer)
@@ -179,53 +178,28 @@ class TrainDataGenerator {
                 audioData,
                 spectrogramSize
             )
-            saveAudioSpectrogram(spectrogramMap)
+            saveAudioSpectrogramAndroid(spectrogramMap, resultFile)
         }
         audioFileReader.release()
 
     }
 
-    fun saveAudioSpectrogram(spectrogramMap: Array<Array<UByte>>, file: File) {
+    fun saveAudioSpectrogramAndroid(spectrogramMap: Array<Array<UByte>>, resultFile: File) {
+        val imageSize = spectrogramMap.size
+        val bitmapResult = Bitmap.createBitmap(imageSize, imageSize, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmapResult)
+        val paint = Paint()
+        paint.setXfermode(PorterDuffXfermode(PorterDuff.Mode.CLEAR))
 
-//        val width = 250
-//        val height = 250
-//
-//        // Constructs a BufferedImage of one of the predefined image types.
-//        val bufferedImage = BufferedImage(width, height, BufferedImage.TYPE_INT_RGB)
-//        // Create a graphics which can be used to draw into the buffered image
-//        val g2d: Graphics2D = bufferedImage.createGraphics()
-//        // fill all the image with white
-//        g2d.setColor(Color.white)
-//        g2d.fillRect(0, 0, width, height)
-//
-//        // create a circle with black
-//
-//        // create a circle with black
-//        g2d.setColor(Color.black)
-//        g2d.fillOval(0, 0, width, height)
-//
-//        // create a string with yellow
-//
-//        // create a string with yellow
-//        g2d.setColor(Color.yellow)
-//        g2d.drawString("Java Code Geeks", 50, 120)
-//
-//        // Disposes of this graphics context and releases any system resources that it is using.
-//
-//        // Disposes of this graphics context and releases any system resources that it is using.
-//        g2d.dispose()
-//
-//        // Save as PNG
-//
-//        // Save as PNG
-//        var file = File("myimage.png")
-//        ImageIO.write(bufferedImage, "png", file)
-//
-//        // Save as JPEG
-//
-//        // Save as JPEG
-//        file = File("myimage.jpg")
-//        ImageIO.write(bufferedImage, "jpg", file)
+        spectrogramMap.forEachIndexed { idx, spectrogram ->
+            val x = idx.toFloat()
+            spectrogram.forEachIndexed { y, amplitude ->
+                paint.color = Color.rgb(amplitude.toInt(), 0, 0)
+                canvas.drawPoint(x, y.toFloat(), paint)
+            }
+        }
+        val os = FileOutputStream(resultFile)
+        bitmapResult.compress(Bitmap.CompressFormat.JPEG, 80, os)
     }
 }
 
@@ -354,7 +328,9 @@ class MorseCodeAudioFileGenerator {
 
 fun main() {
 
-
+    val generator = TrainDataGenerator()
+    val file = File("C:\\Users\\Dmitriy\\Desktop\\morse.wav")
+    generator.generateSymbolSpectrogram(file, 100)
 
 
 }

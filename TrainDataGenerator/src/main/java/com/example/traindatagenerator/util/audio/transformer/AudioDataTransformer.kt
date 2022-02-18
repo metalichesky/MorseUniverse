@@ -3,6 +3,7 @@ package com.example.traindatagenerator.util.audio.transformer
 import com.example.traindatagenerator.model.AudioParams
 import com.example.traindatagenerator.util.math.ComplexNumber
 import com.example.traindatagenerator.util.math.MathUtil
+import com.example.traindatagenerator.util.math.clamp
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
@@ -11,6 +12,10 @@ class AudioDataTransformer {
 
     fun getFloatArraySize(durationMs: Float): Int {
         return (durationMs * audioParams.bytesPerMs).toInt() / audioParams.encoding.bytesPerSample
+    }
+
+    fun getFloatArrayDurationMs(floatArray: FloatArray): Float {
+        return (floatArray.size.toFloat() / (audioParams.bytesPerMs / audioParams.encoding.bytesPerSample))
     }
 
     fun generateFloatArray(durationMs: Float): FloatArray {
@@ -22,9 +27,22 @@ class AudioDataTransformer {
         return (durationMs * audioParams.bytesPerMs).toInt()
     }
 
+    fun getByteArrayDurationMs(floatArray: FloatArray): Float {
+        return (floatArray.size.toFloat() / audioParams.bytesPerMs)
+    }
+
     fun generateByteArray(durationMs: Float): ByteArray {
         val arraySize = getByteArraySize(durationMs)
         return ByteArray(arraySize)
+    }
+
+    fun fillByteArrayWithZeros(srcArray: ByteArray) {
+        val zeroBytes = toByteArray(0f, audioParams.encoding.bytesPerSample)
+        var offset = 0
+        while(offset < srcArray.size) {
+            System.arraycopy(zeroBytes, 0, srcArray, offset, zeroBytes.size)
+            offset += zeroBytes.size
+        }
     }
 
     fun floatArrayToByteArray(srcArray: FloatArray): ByteArray {
@@ -40,7 +58,7 @@ class AudioDataTransformer {
 
         var resultIdx = 0
         var srcIdx = 0
-        while(srcIdx < srcArray.size) {
+        while (srcIdx < srcArray.size) {
             for (channel in 0 until channelsCount) {
                 val value = srcArray[srcIdx]
                 val resultValues = toByteArray(value, byteRate)
@@ -67,7 +85,7 @@ class AudioDataTransformer {
 
         var resultIdx = 0
         var srcIdx = 0
-        while(srcIdx < srcArray.size) {
+        while (srcIdx < srcArray.size) {
             for (channel in 0 until channelsCount) {
                 val value = srcArray[srcIdx]
                 val resultValues = toByteArray(value, byteRate)
@@ -95,7 +113,7 @@ class AudioDataTransformer {
         var srcIdx = 0
         val buffer = ByteArray(byteRate)
 
-        while(srcIdx < srcArray.size) {
+        while (srcIdx < srcArray.size) {
             for (channel in 0 until channelsCount) {
                 if (resultIdx >= resultArray.size) return
                 System.arraycopy(srcArray, srcIdx, buffer, 0, byteRate)
@@ -120,7 +138,7 @@ class AudioDataTransformer {
         var srcIdx = 0
         val buffer = ByteArray(byteRate)
 
-        while(srcIdx < srcArray.size) {
+        while (srcIdx < srcArray.size) {
             for (channel in 0 until channelsCount) {
                 if (resultIdx >= resultArray.size) return
                 System.arraycopy(srcArray, srcIdx, buffer, 0, byteRate)
@@ -131,14 +149,21 @@ class AudioDataTransformer {
         }
     }
 
-    fun floatArrayToComplexArray(srcArray: FloatArray, sizeToPowerOfTwo: Boolean = false): Array<ComplexNumber> {
+    fun floatArrayToComplexArray(
+            srcArray: FloatArray,
+            sizeToPowerOfTwo: Boolean = false
+    ): Array<ComplexNumber> {
         val resultArraySize = MathUtil.getNearestPowerOfTwo(srcArray.size)
         return Array(resultArraySize) { ComplexNumber(srcArray.getOrNull(it) ?: 0f, 0f) }
     }
 
-    fun floatArrayToComplexArray(srcArray: FloatArray, resultArray: Array<ComplexNumber>, sizeToPowerOfTwo: Boolean = false) {
+    fun floatArrayToComplexArray(
+            srcArray: FloatArray,
+            resultArray: Array<ComplexNumber>,
+            sizeToPowerOfTwo: Boolean = false
+    ) {
         var idx = 0
-        while(idx < srcArray.size && idx < resultArray.size) {
+        while (idx < srcArray.size && idx < resultArray.size) {
             resultArray[idx].r = srcArray[idx]
             idx++
         }
@@ -157,7 +182,7 @@ class AudioDataTransformer {
     }
 
     fun copyFloatArray(srcArray: FloatArray): FloatArray {
-        return  FloatArray(srcArray.size) { srcArray[it] }
+        return FloatArray(srcArray.size) { srcArray[it] }
     }
 
     fun copyComplexArray(srcArray: Array<ComplexNumber>): Array<ComplexNumber> {
@@ -231,9 +256,25 @@ class AudioDataTransformer {
             }
             else -> {
                 //make value unsigned here
-                (value.toByte().toUByte().toShort() - audioParams.samplesAmplitude.toShort()).toShort()
+                (value.toByte().toUByte()
+                        .toShort() - audioParams.samplesAmplitude.toShort()).toShort()
             }
         }
+    }
+
+    fun cutFloatArray(srcArray: FloatArray, startMs: Float, endMs: Float): FloatArray {
+        val startIdx = getFloatArraySize(startMs).clamp(0, srcArray.size)
+        val endIdx = getFloatArraySize(endMs).clamp(0, srcArray.size)
+        val resultArraySize = endIdx - startIdx
+        val resultArray = FloatArray(resultArraySize)
+        var srcIdx = startIdx
+        var resultIdx = 0
+        while (srcIdx < endIdx && resultIdx < resultArraySize) {
+            resultArray[resultIdx] = srcArray[srcIdx]
+            srcIdx++
+            resultIdx++
+        }
+        return resultArray
     }
 
 }
@@ -243,9 +284,8 @@ fun main() {
 //    println("value ${value} transformed ${value.toByteArray(4).toFloat()}")
 
 
-
     val dataTransformer =
-        AudioDataTransformer()
+            AudioDataTransformer()
 
     val floatArray = FloatArray(10) {
         it.toFloat()
@@ -261,8 +301,8 @@ fun main() {
 
 fun ByteArray.toFloat(): Float {
     return ByteBuffer.wrap(this)
-        .order(ByteOrder.LITTLE_ENDIAN)
-        .getFloat()
+            .order(ByteOrder.LITTLE_ENDIAN)
+            .getFloat()
 }
 
 fun ByteArray.toByte(): Byte {
@@ -271,35 +311,35 @@ fun ByteArray.toByte(): Byte {
 
 fun ByteArray.toShort(): Short {
     return ByteBuffer.wrap(this)
-        .order(ByteOrder.LITTLE_ENDIAN)
-        .getShort()
+            .order(ByteOrder.LITTLE_ENDIAN)
+            .getShort()
 }
 
 fun ByteArray.toInt(): Int {
     return ByteBuffer.wrap(this)
-        .order(ByteOrder.LITTLE_ENDIAN)
-        .getInt()
+            .order(ByteOrder.LITTLE_ENDIAN)
+            .getInt()
 }
 
 fun Float.toByteArray(bytesCount: Int = 4): ByteArray {
     return ByteBuffer.allocate(bytesCount)
-        .order(ByteOrder.LITTLE_ENDIAN)
-        .putFloat(this)
-        .array()
+            .order(ByteOrder.LITTLE_ENDIAN)
+            .putFloat(this)
+            .array()
 }
 
 fun Int.toByteArray(size: Int = 4): ByteArray {
     return ByteBuffer.allocate(size)
-        .order(ByteOrder.LITTLE_ENDIAN)
-        .putInt(this)
-        .array()
+            .order(ByteOrder.LITTLE_ENDIAN)
+            .putInt(this)
+            .array()
 }
 
 fun Short.toByteArray(): ByteArray {
     return ByteBuffer.allocate(2)
-        .order(ByteOrder.LITTLE_ENDIAN)
-        .putShort(this)
-        .array()
+            .order(ByteOrder.LITTLE_ENDIAN)
+            .putShort(this)
+            .array()
 }
 
 fun Byte.toByteArray(): ByteArray {

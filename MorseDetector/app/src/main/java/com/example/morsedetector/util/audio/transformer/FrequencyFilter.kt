@@ -6,7 +6,6 @@ import com.example.morsedetector.model.clamp
 import com.example.morsedetector.util.audio.file.WavFileWriter
 import com.example.morsedetector.util.audio.generator.FrequencyGenerator
 import com.example.morsedetector.util.audio.generator.NoiseGenerator
-import com.example.morsedetector.util.audio.generator.NoiseType
 import com.example.morsedetector.util.math.ComplexNumber
 import com.example.morsedetector.util.math.FourierTransformer
 import com.example.morsedetector.util.math.Spline

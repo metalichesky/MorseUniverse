@@ -168,14 +168,6 @@ class NoiseGenerator {
     }
 }
 
-enum class NoiseType() {
-    WHITE,
-    PINK,
-    BROWN,
-    BLUE,
-    VIOLET
-}
-
 fun main() {
     val audioParams = AudioParams.createDefault()
     val dataTransformer = AudioDataTransformer()

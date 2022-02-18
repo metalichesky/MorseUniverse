@@ -55,3 +55,11 @@ object MathUtil {
 fun Float.clamp(from: Float, to: Float): Float {
     return Math.min(Math.max(this, from), to)
 }
+
+fun Long.clamp(from: Long, to: Long): Long {
+    return Math.min(Math.max(this, from), to)
+}
+
+fun Int.clamp(from: Int, to: Int): Int {
+    return Math.min(Math.max(this, from), to)
+}

@@ -31,7 +31,10 @@ android {
             jvmTarget = "1.8"
         }
     }
-
+    // Specify tflite file should not be compressed for the app apk
+    aaptOptions {
+        noCompress "tflite"
+    }
 }
 
 dependencies {
@@ -65,6 +68,15 @@ dependencies {
     implementation 'com.jakewharton.rxbinding4:rxbinding:4.0.0'
     // RxPermissions
     implementation 'com.github.tbruyelle:rxpermissions:0.12'
+
+    implementation 'no.tornado:tornadofx-android-compat:1.0.1'
+
+    // Import tflite dependencies
+    implementation 'org.tensorflow:tensorflow-lite:0.0.0-nightly'
+    // The GPU delegate library is optional. Depend on it as needed.
+    implementation 'org.tensorflow:tensorflow-lite-gpu:0.0.0-nightly'
+    implementation 'org.tensorflow:tensorflow-lite-support:0.0.0-nightly'
+    implementation 'org.tensorflow:tensorflow-lite-task-vision:0.0.0-nightly'
 
 
     // graph

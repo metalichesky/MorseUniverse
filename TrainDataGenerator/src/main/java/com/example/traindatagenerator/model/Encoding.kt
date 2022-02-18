@@ -1,10 +1,8 @@
 package com.example.traindatagenerator.model
 
-import android.media.AudioFormat
-
 enum class Encoding(var bytesPerSample: Int, val androidType: Int) {
-    PCM_8BIT(1, AudioFormat.ENCODING_PCM_8BIT),
-    PCM_16BIT(2, AudioFormat.ENCODING_PCM_16BIT),
-    PCM_24BIT(3, AudioFormat.ENCODING_INVALID),
-    PCM_FLOAT(4, AudioFormat.ENCODING_PCM_FLOAT)
+    PCM_8BIT(1, 8),
+    PCM_16BIT(2, 16),
+    PCM_24BIT(3, 24),
+    PCM_FLOAT(4, 32)
 }

@@ -1,6 +1,5 @@
 package com.example.traindatagenerator.util.audio.generator
 
-import android.util.Log
 import com.example.traindatagenerator.model.*
 import com.example.traindatagenerator.util.audio.transformer.AudioDataTransformer
 import com.example.traindatagenerator.util.audio.transformer.AudioMixer
@@ -67,9 +66,9 @@ class MorseCodeSignalGenerator {
         startPadding = true
         endPadding = true
         generatorJob = coroutineScope.launch(Dispatchers.Default) {
-            Log.d(LOG_TAG, "start generator")
+//            Log.d(LOG_TAG, "start generator")
             while (isActive) {
-                Log.d(LOG_TAG, "generator isActive symbols ${symbolsStack.size}")
+//                Log.d(LOG_TAG, "generator isActive symbols ${symbolsStack.size}")
                 val symbol = symbolsStack.poll() ?: continue
                 val unit = symbol.alphabet.getUnitMs(currentGroupPerMinute)
                 val soundSequence = symbol.morseCode.getSoundSequence()
@@ -80,9 +79,11 @@ class MorseCodeSignalGenerator {
 
                 val sequence =
                     soundSequence.joinToString { "beep = ${it.silence} pause ${it.unitDuration}" }
-                Log.d(LOG_TAG, "symbol ${symbol} sequence ${sequence}")
+//                Log.d(LOG_TAG, "symbol ${symbol} sequence ${sequence}")
 
-                while (paused && isActive) { /*stuck in loop to pause*/ Log.d(LOG_TAG, "paused") }
+                while (paused && isActive) { /*stuck in loop to pause*/
+//                    Log.d(LOG_TAG, "paused")
+                }
 
                 if (startPadding) {
                     startPadding = false
@@ -136,7 +137,7 @@ class MorseCodeSignalGenerator {
                     sendDataToAllChannels(dataTransformer.floatArrayToByteArray(paddingBuffer))
                 }
             }
-            Log.d(LOG_TAG, "end generator")
+//            Log.d(LOG_TAG, "end generator")
         }
 //        generatorJob?.start()
     }

@@ -155,6 +155,18 @@ class NoiseGenerator {
             setPointValue(FrequencyPoint.POINT_8000, 0.01f)
             setPointValue(FrequencyPoint.POINT_16000, 0.01f)
         }
+        private val noneNoiseFilter = FrequencyFilter().apply {
+            setPointValue(FrequencyPoint.POINT_30, 0f)
+            setPointValue(FrequencyPoint.POINT_60, 0f)
+            setPointValue(FrequencyPoint.POINT_120, 0f)
+            setPointValue(FrequencyPoint.POINT_250, 0f)
+            setPointValue(FrequencyPoint.POINT_500, 0f)
+            setPointValue(FrequencyPoint.POINT_1000, 0f)
+            setPointValue(FrequencyPoint.POINT_2000, 0f)
+            setPointValue(FrequencyPoint.POINT_4000, 0f)
+            setPointValue(FrequencyPoint.POINT_8000, 0f)
+            setPointValue(FrequencyPoint.POINT_16000, 0f)
+        }
 
         fun createNoiseFilter(type: NoiseType): FrequencyFilter {
             return when (type) {
@@ -163,6 +175,7 @@ class NoiseGenerator {
                 NoiseType.WHITE -> whiteNoiseFilter
                 NoiseType.PINK -> pinkNoiseFilter
                 NoiseType.BROWN -> brownNoiseFilter
+                NoiseType.NONE -> noneNoiseFilter
             }
         }
     }
@@ -173,7 +186,8 @@ enum class NoiseType() {
     PINK,
     BROWN,
     BLUE,
-    VIOLET
+    VIOLET,
+    NONE
 }
 
 fun main() {

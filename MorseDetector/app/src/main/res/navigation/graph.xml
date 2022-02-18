@@ -1,8 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    app:startDestination="@id/fragmentSoundGenerator"
+    app:startDestination="@id/fragmentMain"
     android:id="@+id/graph">
+
+    <fragment
+        android:id="@+id/fragmentMain"
+        android:name="com.example.morsedetector.ui.MainFragment"
+        android:label="FragmentMain" >
+        <action
+            android:id="@+id/action_fragmentMain_to_fragmentDecoder"
+            app:destination="@id/fragmentDecoder" />
+        <action
+            android:id="@+id/action_fragmentMain_to_fragmentSoundGenerator"
+            app:destination="@id/fragmentSoundGenerator" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/fragmentDecoder"
+        android:name="com.example.morsedetector.ui.DecoderFragment"
+        android:label="FragmentDecoder" />
 
     <fragment
         android:id="@+id/fragmentSoundGenerator"

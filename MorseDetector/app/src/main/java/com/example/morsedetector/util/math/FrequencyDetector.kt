@@ -11,9 +11,6 @@ class FrequencyDetector {
 
     val audioParams = AudioParams.createDefault()
 
-
-
-
     fun getFrequenciesFromSpectrum(data: Array<ComplexNumber>) {
         val samplesCount = data.size
         val frequencyResolution = FrequencyAudioFilter.getFrequencyResolution(samplesCount, audioParams.sampleRate)

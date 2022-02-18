@@ -1,5 +1,6 @@
 package com.example.morsedetector.util
 
+import android.Manifest
 import com.example.morsedetector.model.Alphabet
 import com.example.morsedetector.model.Encoding
 import com.example.morsedetector.model.MorseCode
@@ -10,7 +11,11 @@ object Constants {
     const val DEFAULT_SAMPLE_RATE = 48000
     const val DEFAULT_CHANNELS_COUNT = 1
     val DEFAULT_ENCODING = Encoding.PCM_8BIT
-
+    val neededPermissions = listOf(
+        Manifest.permission.READ_EXTERNAL_STORAGE,
+        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+        Manifest.permission.RECORD_AUDIO
+    )
 
     const val MORSE_GROUP_SIZE = 5
 
@@ -77,7 +82,7 @@ object Constants {
             Symbol(this, "Щ", 0.0036f, MorseCode("--.-")),
 //        Symbol("Ъ", 0.0004f, MorseCode("")),
             Symbol(this, "Ы", 0.019f, MorseCode("-.--")),
-            Symbol(this, "Ь", 0.0174f, MorseCode("-...")),
+            Symbol(this, "Ь", 0.0174f, MorseCode("-..-")),
             Symbol(this, "Э", 0.0032f, MorseCode("..-..")),
             Symbol(this, "Ю", 0.0064f, MorseCode("..--")),
             Symbol(this, "Я", 0.0201f, MorseCode(".-.-"))

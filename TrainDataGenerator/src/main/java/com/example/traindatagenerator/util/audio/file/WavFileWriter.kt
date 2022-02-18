@@ -39,6 +39,7 @@ class WavFileWriter {
 
     fun complete(file: File, audioParams: AudioParams) {
         val tempFile = tempFile ?: return
+        file.createNewFile()
         val sourceFileStream = BufferedInputStream(tempFile.inputStream())
         val destinationFileStream = BufferedOutputStream(file.outputStream())
         val byteArray = ByteArray(8 * 1024)
@@ -56,6 +57,7 @@ class WavFileWriter {
             destinationFileStream.write(byteArray, 0, readed)
             readed = sourceFileStream.read(byteArray)
         }
+        sourceFileStream.close()
         destinationFileStream.flush()
         destinationFileStream.close()
     }

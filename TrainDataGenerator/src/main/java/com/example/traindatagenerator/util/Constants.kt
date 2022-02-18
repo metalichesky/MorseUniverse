@@ -77,7 +77,7 @@ object Constants {
             Symbol(this, "Щ", 0.0036f, MorseCode("--.-")),
 //        Symbol("Ъ", 0.0004f, MorseCode("")),
             Symbol(this, "Ы", 0.019f, MorseCode("-.--")),
-            Symbol(this, "Ь", 0.0174f, MorseCode("-...")),
+            Symbol(this, "Ь", 0.0174f, MorseCode("-..-")),
             Symbol(this, "Э", 0.0032f, MorseCode("..-..")),
             Symbol(this, "Ю", 0.0064f, MorseCode("..--")),
             Symbol(this, "Я", 0.0201f, MorseCode(".-.-"))

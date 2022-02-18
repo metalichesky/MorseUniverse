@@ -1,6 +1,5 @@
 package com.example.traindatagenerator.util.audio.generator
 
-import android.util.Log
 import com.example.traindatagenerator.model.AudioParams
 import kotlinx.coroutines.delay
 import java.util.*
@@ -30,7 +29,7 @@ class Channel() {
         while (dataDuration > availableDuration) {
             //freeSpaceForDuration(dataDuration)
             availableDuration = getAvailableDuration()
-            Log.d(LOG_TAG, "sendData() ${data} duration ${dataDuration} available ${availableDuration} from last read ${fromLastRead}")
+//            Log.d(LOG_TAG, "sendData() ${data} duration ${dataDuration} available ${availableDuration} from last read ${fromLastRead}")
             delay(10)
             //wait here for data readed
         }
